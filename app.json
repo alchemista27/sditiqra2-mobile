@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "SDIT Iqra 2 - Absensi",
+    "slug": "sditiqra2-absensi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F3D24"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sditiqra2.absensi",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Aplikasi memerlukan akses lokasi GPS untuk verifikasi absensi kehadiran",
+        "NSLocationAlwaysUsageDescription": "Aplikasi memerlukan akses lokasi GPS untuk verifikasi absensi kehadiran",
+        "NSCameraUsageDescription": "Aplikasi memerlukan akses kamera untuk foto selfie verifikasi wajah saat absensi"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F3D24"
+      },
+      "package": "com.sditiqra2.absensi",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Aplikasi memerlukan akses lokasi GPS untuk verifikasi absensi kehadiran"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Aplikasi memerlukan akses kamera untuk foto selfie verifikasi wajah saat absensi"
+        }
+      ]
+    ]
+  }
+}
