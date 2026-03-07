@@ -1,6 +1,7 @@
 # Sistem Absensi GPS — Mobile App (React Native/Expo)
 
 Aplikasi mobile resmi untuk presensi guru dan karyawan SD Islam Terpadu Iqra 2 Kota Bengkulu. 
+Aplikasi ini merupakan satu dari tiga pilar sistem digital sekolah (bersama dengan Portal PPDB dan Web CMS). Dikhususkan untuk menangani *tracking* kehadiran pegawai secara *real-time*.
 
 Aplikasi ini menggunakan teknologi GPS Geofencing untuk mendeteksi lokasi kehadiran, fitur Anti-Fake GPS, serta deteksi wajah (Face Recognition) menggunakan TensorFlow.js yang berjalan sepenuhnya 100% secara offline di perangkat pengguna (client-side) tanpa membebani server.
 
