@@ -32,20 +32,6 @@
         "ACCESS_COARSE_LOCATION",
         "CAMERA"
       ]
-    },
-    "plugins": [
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "Aplikasi memerlukan akses lokasi GPS untuk verifikasi absensi kehadiran"
-        }
-      ],
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Aplikasi memerlukan akses kamera untuk foto selfie verifikasi wajah saat absensi"
-        }
-      ]
-    ]
+    }
   }
 }

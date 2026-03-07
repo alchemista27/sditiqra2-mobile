@@ -1,6 +1,7 @@
 // src/screens/ProfileScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { storage } from '../utils/storage';
 
 interface Props { onLogout: () => void; }
@@ -39,7 +40,10 @@ export default function ProfileScreen({ onLogout }: Props) {
       </View>
 
       <TouchableOpacity style={s.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
-        <Text style={s.logoutTxt}>🚪 Keluar dari Akun</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <MaterialIcons name="logout" size={18} color="#991B1B" />
+          <Text style={s.logoutTxt}>Keluar dari Akun</Text>
+        </View>
       </TouchableOpacity>
       <View style={{ height: 32 }} />
     </ScrollView>

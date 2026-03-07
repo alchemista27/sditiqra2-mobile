@@ -5,6 +5,7 @@ import {
   View, Text, StyleSheet, TouchableOpacity, Alert,
   ActivityIndicator, ScrollView, RefreshControl,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 import { useLocation } from '../hooks/useLocation';
 import { useFaceDetection } from '../hooks/useFaceDetection';
@@ -63,7 +64,7 @@ export default function HomeScreen() {
       );
       if (!check.isWithin) {
         Alert.alert(
-          '⚠️ Di Luar Radius',
+          'Di Luar Radius',
           `Anda berada ${check.distance}m dari sekolah (max: ${status.config.radiusMeters}m). Absensi akan ditandai sebagai anomali.`,
           [
             { text: 'Batal', style: 'cancel' },
@@ -75,7 +76,7 @@ export default function HomeScreen() {
     }
 
     if (location.isMockGps) {
-      Alert.alert('🚫 Fake GPS Terdeteksi', 'Anda menggunakan GPS palsu. Absensi tidak dapat dilakukan.');
+      Alert.alert('Fake GPS Terdeteksi', 'Anda menggunakan GPS palsu. Absensi tidak dapat dilakukan.');
       return;
     }
 
@@ -103,7 +104,7 @@ export default function HomeScreen() {
     // Check face verification result
     if (!faceResult.verified && faceResult.faceDetected) {
       Alert.alert(
-        '⚠️ Verifikasi Wajah Gagal',
+        'Verifikasi Wajah Gagal',
         `${faceResult.message}\n\nApakah Anda ingin melanjutkan absensi?`,
         [
           { text: 'Ulangi', style: 'cancel' },
@@ -114,7 +115,7 @@ export default function HomeScreen() {
     }
 
     if (!faceResult.faceDetected) {
-      Alert.alert('❌ Wajah Tidak Terdeteksi', faceResult.message);
+      Alert.alert('Wajah Tidak Terdeteksi', faceResult.message);
       return;
     }
 
@@ -141,7 +142,7 @@ export default function HomeScreen() {
       }
 
       const confText = faceResult.confidence < 1 ? ` (Face: ${Math.round(faceResult.confidence * 100)}%)` : '';
-      Alert.alert('✅ Berhasil', `${res.message}${confText}`);
+      Alert.alert('Berhasil', `${res.message}${confText}`);
       await loadData();
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message;
@@ -208,7 +209,7 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Assalamu'alaikum 👋</Text>
+          <Text style={styles.greeting}>Assalamu'alaikum <MaterialIcons name="waving-hand" size={14} color="rgba(255,255,255,0.7)" /></Text>
           <Text style={styles.userName}>{user?.name || 'Pengguna'}</Text>
         </View>
         <View style={styles.dateBadge}>
@@ -219,7 +220,7 @@ export default function HomeScreen() {
       {/* Holiday Banner */}
       {status?.isHoliday && (
         <View style={styles.holidayBanner}>
-          <Text style={styles.holidayIcon}>🎉</Text>
+          <MaterialIcons name="celebration" size={24} color="#92400E" style={{ marginRight: 10 }} />
           <Text style={styles.holidayText}>Hari ini libur: {status.holidayName}</Text>
         </View>
       )}
@@ -227,9 +228,10 @@ export default function HomeScreen() {
       {/* GPS Status */}
       <View style={styles.gpsCard}>
         <View style={styles.gpsHeader}>
-          <Text style={styles.gpsTitle}>📍 Status GPS</Text>
-          <TouchableOpacity onPress={refreshGps}>
-            <Text style={styles.refreshText}>↻ Refresh</Text>
+          <Text style={styles.gpsTitle}><MaterialIcons name="location-pin" size={16} /> Status GPS</Text>
+          <TouchableOpacity onPress={refreshGps} style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <MaterialIcons name="refresh" size={14} color="#1B6B44" />
+            <Text style={styles.refreshText}> Refresh</Text>
           </TouchableOpacity>
         </View>
         {gpsLoading ? (
@@ -249,7 +251,7 @@ export default function HomeScreen() {
             <View style={styles.gpsRow}>
               <Text style={styles.gpsLabel}>Mock GPS</Text>
               <Text style={[styles.gpsValue, location.isMockGps ? styles.textDanger : styles.textSuccess]}>
-                {location.isMockGps ? '⚠️ Terdeteksi' : '✅ Asli'}
+                {location.isMockGps ? <><MaterialIcons name="warning" size={13} /> Terdeteksi</> : <><MaterialIcons name="check-circle" size={13} /> Asli</>}
               </Text>
             </View>
             {status?.config && (
@@ -263,7 +265,7 @@ export default function HomeScreen() {
                       status.config.radiusMeters
                     );
                     return (<Text style={d.isWithin ? styles.textSuccess : styles.textDanger}>
-                      {d.distance}m {d.isWithin ? '✅ Dalam radius' : `⚠️ Luar radius (max ${status.config.radiusMeters}m)`}
+                      {d.distance}m {d.isWithin ? <><MaterialIcons name="check-circle" size={13} /> Dalam radius</> : <><MaterialIcons name="warning" size={13} /> Luar radius</>}
                     </Text>) as any;
                   })()}
                 </Text>
@@ -308,7 +310,7 @@ export default function HomeScreen() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Text style={styles.clockBtnIcon}>📥</Text>
+                  <MaterialIcons name="login" size={28} color="#fff" style={{ marginBottom: 4 }} />
                   <Text style={styles.clockBtnText}>CLOCK IN</Text>
                   <Text style={styles.clockBtnSub}>Catat kehadiran masuk</Text>
                 </>
@@ -325,7 +327,7 @@ export default function HomeScreen() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <>
-                  <Text style={styles.clockBtnIcon}>📤</Text>
+                  <MaterialIcons name="logout" size={28} color="#fff" style={{ marginBottom: 4 }} />
                   <Text style={styles.clockBtnText}>CLOCK OUT</Text>
                   <Text style={styles.clockBtnSub}>Catat kehadiran pulang</Text>
                 </>
@@ -333,7 +335,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ) : (
             <View style={styles.doneCard}>
-              <Text style={styles.doneIcon}>🎉</Text>
+              <MaterialIcons name="done-all" size={36} color="#065F46" style={{ marginBottom: 8 }} />
               <Text style={styles.doneText}>Absensi hari ini sudah lengkap!</Text>
               <Text style={styles.doneSub}>
                 Masuk: {formatTime(status?.clockIn)} — Pulang: {formatTime(status?.clockOut)}

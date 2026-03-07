@@ -1,20 +1,22 @@
 // src/screens/LeaveScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator, Modal } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { leaveService } from '../api/services';
 
 const leaveTypes = [
-  { value: 'IZIN', label: 'Izin', icon: '📝' },
-  { value: 'SAKIT', label: 'Sakit', icon: '🏥' },
-  { value: 'CUTI', label: 'Cuti', icon: '🏖️' },
-  { value: 'DINAS', label: 'Dinas', icon: '🚗' },
+  { value: 'IZIN', label: 'Izin', icon: 'assignment' as any },
+  { value: 'SAKIT', label: 'Sakit', icon: 'local-hospital' as any },
+  { value: 'CUTI', label: 'Cuti', icon: 'beach-access' as any },
+  { value: 'DINAS', label: 'Dinas', icon: 'directions-car' as any },
 ];
 
-const statusInfo: Record<string, { bg: string; color: string; label: string }> = {
-  PENDING: { bg: '#FEF3C7', color: '#92400E', label: '⏳ Menunggu' },
-  APPROVED: { bg: '#D1FAE5', color: '#065F46', label: '✅ Disetujui' },
-  REJECTED: { bg: '#FEE2E2', color: '#991B1B', label: '❌ Ditolak' },
+const statusInfo: Record<string, { bg: string; color: string; label: string; icon: string }> = {
+  PENDING: { bg: '#FEF3C7', color: '#92400E', label: 'Menunggu', icon: 'hourglass-empty' },
+  APPROVED: { bg: '#D1FAE5', color: '#065F46', label: 'Disetujui', icon: 'check-circle' },
+  REJECTED: { bg: '#FEE2E2', color: '#991B1B', label: 'Ditolak', icon: 'cancel' },
 };
+
 
 export default function LeaveScreen() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export default function LeaveScreen() {
     setSubmitting(true);
     try {
       await leaveService.create(form);
-      Alert.alert('✅ Berhasil', 'Pengajuan izin berhasil dikirim.');
+      Alert.alert('Berhasil', 'Pengajuan izin berhasil dikirim.');
       setShowForm(false);
       setForm({ type: 'IZIN', startDate: '', endDate: '', reason: '' });
       fetchRequests();
@@ -63,7 +65,7 @@ export default function LeaveScreen() {
       {loading ? <ActivityIndicator color="#1B6B44" style={{ marginTop: 40 }} size="large" /> :
       requests.length === 0 ? (
         <View style={s.empty}>
-          <Text style={{ fontSize: 48 }}>📋</Text>
+          <MaterialIcons name="assignment" size={48} color="#9CA3AF" />
           <Text style={s.emptyTxt}>Belum ada pengajuan</Text>
         </View>
       ) : (
@@ -74,12 +76,13 @@ export default function LeaveScreen() {
             return (
               <View key={req.id} style={s.card}>
                 <View style={s.cardHead}>
-                  <Text style={s.cardType}>{lt?.icon} {lt?.label || req.type}</Text>
-                  <View style={[s.badge, { backgroundColor: sc.bg }]}>
+                  <Text style={s.cardType}><MaterialIcons name={lt?.icon || 'assignment'} size={15} /> {lt?.label || req.type}</Text>
+                  <View style={[s.badge, { backgroundColor: sc.bg, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                    <MaterialIcons name={sc.icon as any} size={11} color={sc.color} />
                     <Text style={[s.badgeTxt, { color: sc.color }]}>{sc.label}</Text>
                   </View>
                 </View>
-                <Text style={s.cardDate}>📅 {fmtDate(req.startDate)} — {fmtDate(req.endDate)}</Text>
+                <Text style={s.cardDate}><MaterialIcons name="event" size={13} color="#6B7280" /> {fmtDate(req.startDate)} — {fmtDate(req.endDate)}</Text>
                 <Text style={s.cardReason}>{req.reason}</Text>
                 {req.approverNote && (
                   <View style={s.noteBox}>
@@ -102,7 +105,7 @@ export default function LeaveScreen() {
               {leaveTypes.map(opt => (
                 <TouchableOpacity key={opt.value} onPress={() => setForm({ ...form, type: opt.value })}
                   style={[s.typeBtn, form.type === opt.value && s.typeBtnOn]}>
-                  <Text style={{ fontSize: 20 }}>{opt.icon}</Text>
+                  <MaterialIcons name={opt.icon} size={24} color={form.type === opt.value ? '#fff' : '#6B7280'} />
                   <Text style={[s.typeTxt, form.type === opt.value && { color: '#fff' }]}>{opt.label}</Text>
                 </TouchableOpacity>
               ))}

@@ -5,6 +5,7 @@ import {
   View, Text, StyleSheet, TouchableOpacity, Alert,
   ActivityIndicator, Image,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 import { useFaceDetection } from '../hooks/useFaceDetection';
 import { initTF, isReady } from '../utils/faceEngine';
@@ -53,9 +54,9 @@ export default function FaceRegisterScreen({ onComplete, onSkip }: Props) {
       setPreviewUri(result.selfieUri);
       if (result.verified) {
         setRegistered(true);
-        Alert.alert('✅ Berhasil', result.message);
+        Alert.alert('Berhasil', result.message);
       } else {
-        Alert.alert('❌ Gagal', result.message);
+        Alert.alert('Gagal', result.message);
       }
     }
   };
@@ -76,7 +77,7 @@ export default function FaceRegisterScreen({ onComplete, onSkip }: Props) {
       <View style={s.cameraWrap}>
         <CameraView ref={cameraRef} style={s.camera} facing="front">
           <View style={s.cameraOverlay}>
-            <Text style={s.cameraTitle}>📸 Registrasi Wajah</Text>
+            <Text style={s.cameraTitle}><MaterialIcons name="camera-alt" size={18} /> Registrasi Wajah</Text>
             <View style={s.faceFrame} />
             <Text style={s.cameraHint}>
               Posisikan wajah Anda dalam bingkai{'\n'}
@@ -119,7 +120,7 @@ export default function FaceRegisterScreen({ onComplete, onSkip }: Props) {
           <>
             {/* Status */}
             <View style={[s.statusCard, registered ? s.statusDone : s.statusPending]}>
-              <Text style={s.statusIcon}>{registered ? '✅' : '⚠️'}</Text>
+              <MaterialIcons name={registered ? "check-circle" : "warning"} size={36} color={registered ? "#065F46" : "#92400E"} style={{ marginBottom: 8 }} />
               <Text style={s.statusText}>
                 {registered ? 'Wajah Anda sudah terdaftar' : 'Wajah belum didaftarkan'}
               </Text>
@@ -142,17 +143,17 @@ export default function FaceRegisterScreen({ onComplete, onSkip }: Props) {
             <View style={s.actionsList}>
               {!registered ? (
                 <TouchableOpacity style={s.registerBtn} onPress={handleOpenCamera} activeOpacity={0.8}>
-                  <Text style={s.registerIcon}>📸</Text>
+                  <MaterialIcons name="camera-alt" size={28} color="#fff" style={{ marginBottom: 4 }} />
                   <Text style={s.registerTxt}>Daftarkan Wajah Saya</Text>
                   <Text style={s.registerHint}>Ambil foto wajah untuk registrasi</Text>
                 </TouchableOpacity>
               ) : (
                 <>
                   <TouchableOpacity style={s.reRegBtn} onPress={handleOpenCamera} activeOpacity={0.8}>
-                    <Text style={s.reRegTxt}>🔄 Daftarkan Ulang Wajah</Text>
+                    <Text style={s.reRegTxt}><MaterialIcons name="refresh" size={14} /> Daftarkan Ulang Wajah</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={s.resetBtn} onPress={handleReset}>
-                    <Text style={s.resetTxt}>🗑️ Hapus Data Wajah</Text>
+                    <Text style={s.resetTxt}><MaterialIcons name="delete" size={13} /> Hapus Data Wajah</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -160,7 +161,7 @@ export default function FaceRegisterScreen({ onComplete, onSkip }: Props) {
 
             {/* Info */}
             <View style={s.infoCard}>
-              <Text style={s.infoTitle}>ℹ️ Tentang Face Recognition</Text>
+              <Text style={s.infoTitle}><MaterialIcons name="info" size={13} /> Tentang Face Recognition</Text>
               <Text style={s.infoText}>
                 • Pemrosesan wajah dilakukan 100% di perangkat Anda{'\n'}
                 • Data wajah TIDAK dikirim ke server{'\n'}
@@ -175,7 +176,7 @@ export default function FaceRegisterScreen({ onComplete, onSkip }: Props) {
         <View style={s.bottomActions}>
           {registered && (
             <TouchableOpacity style={s.doneBtn} onPress={onComplete} activeOpacity={0.8}>
-              <Text style={s.doneTxt}>✅ Selesai</Text>
+              <Text style={s.doneTxt}><MaterialIcons name="check" size={15} /> Selesai</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity style={s.skipBtn} onPress={onSkip}>

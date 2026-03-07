@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 // App.tsx — Entry point with TF.js initialization
 import React, { useState, useEffect } from 'react';
 import { StatusBar, View, Text, ActivityIndicator } from 'react-native';

@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, Alert, ActivityIndicator,
+  KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Image
 } from 'react-native';
-import { authService } from '../api/services';
+import { authService, cmsService } from '../api/services';
 import { storage } from '../utils/storage';
+import { API_BASE_URL } from '../api/config';
 
 interface Props {
   onLogin: () => void;
@@ -16,6 +17,20 @@ export default function LoginScreen({ onLogin }: Props) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    // Fetch CMS settings to get the public logo
+    cmsService.getSettings()
+      .then((data: any[]) => {
+        const logoSetting = data.find(s => s.key === 'site_logo');
+        if (logoSetting?.value) {
+          const url = logoSetting.value;
+          setLogoUrl(url.startsWith('http') ? url : `${API_BASE_URL.replace('/api', '')}${url}`);
+        }
+      })
+      .catch(err => console.log('Silently failed to load CMS settings:', err));
+  }, []);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -42,9 +57,13 @@ export default function LoginScreen({ onLogin }: Props) {
       <View style={styles.inner}>
         {/* Logo */}
         <View style={styles.logoContainer}>
-          <View style={styles.logo}>
-            <Text style={styles.logoText}>I2</Text>
-          </View>
+          {logoUrl ? (
+             <Image source={{ uri: logoUrl }} style={styles.logoImage} resizeMode="contain" />
+          ) : (
+            <View style={styles.logo}>
+              <Text style={styles.logoText}>I2</Text>
+            </View>
+          )}
           <Text style={styles.schoolName}>SDIT Iqra 2</Text>
           <Text style={styles.subtitle}>Sistem Absensi Digital</Text>
         </View>
@@ -113,6 +132,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0F3D24' },
   inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
   logoContainer: { alignItems: 'center', marginBottom: 32 },
+  logoImage: {
+    width: 80, height: 80, borderRadius: 20,
+    backgroundColor: '#fff',
+  },
   logo: {
     width: 72, height: 72, borderRadius: 20,
     backgroundColor: '#2D9164', justifyContent: 'center', alignItems: 'center',

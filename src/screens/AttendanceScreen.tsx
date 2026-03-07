@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { attendanceService } from '../api/services';
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -91,7 +92,7 @@ export default function AttendanceScreen() {
         <ActivityIndicator color="#1B6B44" style={{ marginTop: 40 }} size="large" />
       ) : logs.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <MaterialIcons name="fact-check" size={48} color="#374151" style={{ marginBottom: 12 }} />
           <Text style={styles.emptyText}>Belum ada data kehadiran</Text>
           <Text style={styles.emptySub}>{monthNames[month - 1]} {year}</Text>
         </View>
@@ -115,7 +116,7 @@ export default function AttendanceScreen() {
                     <Text style={styles.logTimeLabel}>Pulang: <Text style={styles.logTimeValue}>{formatTime(log.clockOut)}</Text></Text>
                   </View>
                   {log.anomalyFlag && (
-                    <Text style={styles.anomalyText}>⚠️ {log.anomalyFlag === 'MOCK_GPS' ? 'Fake GPS' : log.anomalyFlag === 'OUT_OF_RADIUS' ? 'Luar Radius' : log.anomalyFlag}</Text>
+                    <Text style={styles.anomalyText}><MaterialIcons name="warning" size={11} /> {log.anomalyFlag === 'MOCK_GPS' ? 'Fake GPS' : log.anomalyFlag === 'OUT_OF_RADIUS' ? 'Luar Radius' : log.anomalyFlag}</Text>
                   )}
                 </View>
                 <View style={[styles.typeBadge, { backgroundColor: tc.bg }]}>

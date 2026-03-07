@@ -79,3 +79,12 @@ export const holidayService = {
     return res.data;
   },
 };
+
+// ─── CMS Settings ──────────────────────────────────────────────
+export const cmsService = {
+  getSettings: async () => {
+    // CMS public settings (does not require authentication token)
+    const res = await apiClient.get('/cms/settings');
+    return res.data;
+  },
+};
