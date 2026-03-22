@@ -4,33 +4,19 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, Alert, ActivityIndicator, Image
 } from 'react-native';
-import { authService, cmsService } from '../api/services';
+import { authService } from '../api/services';
 import { storage } from '../utils/storage';
-import { API_BASE_URL } from '../api/config';
 
 interface Props {
   onLogin: () => void;
+  logoUrl?: string | null; // Passed from App.tsx (already fetched during splash)
 }
 
-export default function LoginScreen({ onLogin }: Props) {
+export default function LoginScreen({ onLogin, logoUrl = null }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-
-  React.useEffect(() => {
-    // Fetch CMS settings to get the public logo
-    // cmsService.getSettings() now returns the settings object directly: { site_logo: "url", ... }
-    cmsService.getSettings()
-      .then((data: Record<string, string>) => {
-        const url = data?.site_logo;
-        if (url) {
-          setLogoUrl(url.startsWith('http') ? url : `${API_BASE_URL.replace('/api', '')}${url}`);
-        }
-      })
-      .catch(err => console.log('Silently failed to load CMS settings:', err));
-  }, []);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {

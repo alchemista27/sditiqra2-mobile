@@ -1,7 +1,7 @@
 // src/navigation/AppNavigator.tsx
 // Drawer (sidebar) navigator menggantikan bottom tab untuk menghindari
 // overlap dengan tombol Home/Back di Android gesture bar
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   Image, Alert,
@@ -22,8 +22,6 @@ import LeaveScreen from '../screens/LeaveScreen';
 import FaceRegisterScreen from '../screens/FaceRegisterScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { storage } from '../utils/storage';
-import { cmsService } from '../api/services';
-import { API_BASE_URL } from '../api/config';
 
 const Drawer = createDrawerNavigator();
 
@@ -96,22 +94,12 @@ function CustomDrawerContent({ onLogout, logoUrl, ...props }: DrawerProps) {
 // ───────────────────────────────────────────
 // App Navigator
 // ───────────────────────────────────────────
-interface Props { onLogout: () => void; }
+interface Props {
+  onLogout: () => void;
+  logoUrl?: string | null; // Passed from App.tsx (already fetched during splash)
+}
 
-export default function AppNavigator({ onLogout }: Props) {
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    cmsService.getSettings()
-      .then((data: Record<string, string>) => {
-        const url = data?.site_logo;
-        if (url) {
-          setLogoUrl(url.startsWith('http') ? url : `${API_BASE_URL.replace('/api', '')}${url}`);
-        }
-      })
-      .catch(err => console.log('[AppNavigator] Gagal memuat logo:', err));
-  }, []);
-
+export default function AppNavigator({ onLogout, logoUrl = null }: Props) {
   const drawerContent = useCallback(
     (props: DrawerContentComponentProps) => (
       <CustomDrawerContent {...props} onLogout={onLogout} logoUrl={logoUrl} />
