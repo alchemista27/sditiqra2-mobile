@@ -21,11 +21,11 @@ export default function LoginScreen({ onLogin }: Props) {
 
   React.useEffect(() => {
     // Fetch CMS settings to get the public logo
+    // cmsService.getSettings() now returns the settings object directly: { site_logo: "url", ... }
     cmsService.getSettings()
-      .then((data: any[]) => {
-        const logoSetting = data.find(s => s.key === 'site_logo');
-        if (logoSetting?.value) {
-          const url = logoSetting.value;
+      .then((data: Record<string, string>) => {
+        const url = data?.site_logo;
+        if (url) {
           setLogoUrl(url.startsWith('http') ? url : `${API_BASE_URL.replace('/api', '')}${url}`);
         }
       })

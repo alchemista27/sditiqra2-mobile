@@ -84,7 +84,8 @@ export const holidayService = {
 export const cmsService = {
   getSettings: async () => {
     // CMS public settings (does not require authentication token)
+    // Returns the settings object directly: { site_logo: "url", site_name: "...", ... }
     const res = await apiClient.get('/cms/settings');
-    return res.data;
+    return res.data.data;
   },
 };

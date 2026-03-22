@@ -1,7 +1,7 @@
 // src/navigation/AppNavigator.tsx
 // Drawer (sidebar) navigator menggantikan bottom tab untuk menghindari
 // overlap dengan tombol Home/Back di Android gesture bar
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   Image, Alert,
@@ -22,6 +22,8 @@ import LeaveScreen from '../screens/LeaveScreen';
 import FaceRegisterScreen from '../screens/FaceRegisterScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { storage } from '../utils/storage';
+import { cmsService } from '../api/services';
+import { API_BASE_URL } from '../api/config';
 
 const Drawer = createDrawerNavigator();
 
@@ -30,9 +32,10 @@ const Drawer = createDrawerNavigator();
 // ───────────────────────────────────────────
 interface DrawerProps extends DrawerContentComponentProps {
   onLogout: () => void;
+  logoUrl: string | null;
 }
 
-function CustomDrawerContent({ onLogout, ...props }: DrawerProps) {
+function CustomDrawerContent({ onLogout, logoUrl, ...props }: DrawerProps) {
   const insets = useSafeAreaInsets();
 
   const handleLogout = useCallback(() => {
@@ -54,7 +57,15 @@ function CustomDrawerContent({ onLogout, ...props }: DrawerProps) {
       {/* Header */}
       <View style={styles.drawerHeader}>
         <View style={styles.logoCircle}>
-          <MaterialIcons name="school" size={36} color="#fff" />
+          {logoUrl ? (
+            <Image
+              source={{ uri: logoUrl }}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <MaterialIcons name="school" size={36} color="#fff" />
+          )}
         </View>
         <Text style={styles.drawerTitle}>SDIT Iqra 2</Text>
         <Text style={styles.drawerSubtitle}>Sistem Absensi Digital</Text>
@@ -88,11 +99,24 @@ function CustomDrawerContent({ onLogout, ...props }: DrawerProps) {
 interface Props { onLogout: () => void; }
 
 export default function AppNavigator({ onLogout }: Props) {
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    cmsService.getSettings()
+      .then((data: Record<string, string>) => {
+        const url = data?.site_logo;
+        if (url) {
+          setLogoUrl(url.startsWith('http') ? url : `${API_BASE_URL.replace('/api', '')}${url}`);
+        }
+      })
+      .catch(err => console.log('[AppNavigator] Gagal memuat logo:', err));
+  }, []);
+
   const drawerContent = useCallback(
     (props: DrawerContentComponentProps) => (
-      <CustomDrawerContent {...props} onLogout={onLogout} />
+      <CustomDrawerContent {...props} onLogout={onLogout} logoUrl={logoUrl} />
     ),
-    [onLogout]
+    [onLogout, logoUrl]
   );
 
   return (
@@ -206,6 +230,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+    overflow: 'hidden',
+  },
+  logoImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
   },
   drawerTitle: {
     color: '#fff',
