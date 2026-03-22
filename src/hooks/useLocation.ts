@@ -30,36 +30,56 @@ export function useLocation(): UseLocationResult {
   // Request permission
   useEffect(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Izin lokasi GPS ditolak. Harap izinkan akses lokasi di pengaturan.');
-        return;
+      console.log('[useLocation] Meminta izin lokasi foreground...');
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        console.log('[useLocation] Status izin lokasi:', status);
+        if (status !== 'granted') {
+          console.warn('[useLocation] Izin lokasi DITOLAK, status:', status);
+          setError('Izin lokasi GPS ditolak. Harap izinkan akses lokasi di pengaturan.');
+          return;
+        }
+        setPermissionGranted(true);
+        console.log('[useLocation] Izin lokasi diberikan.');
+      } catch (permErr: any) {
+        console.error('[useLocation] Error saat meminta izin:', permErr.message, permErr);
+        setError(`Gagal meminta izin lokasi: ${permErr.message}`);
       }
-      setPermissionGranted(true);
     })();
   }, []);
 
   const refresh = useCallback(async () => {
     if (!permissionGranted) {
+      console.warn('[useLocation] refresh() dipanggil tapi izin belum diberikan.');
       setError('Izin lokasi GPS belum diberikan.');
       return;
     }
 
     setLoading(true);
     setError(null);
+    console.log('[useLocation] Memulai fetch lokasi GPS...');
 
     try {
       // Cek apakah GPS aktif
       const enabled = await Location.hasServicesEnabledAsync();
+      console.log('[useLocation] GPS services enabled:', enabled);
       if (!enabled) {
+        console.warn('[useLocation] GPS tidak aktif di perangkat.');
         setError('GPS tidak aktif. Harap nyalakan GPS Anda.');
         setLoading(false);
         return;
       }
 
       // Ambil lokasi dengan akurasi tinggi
+      console.log('[useLocation] Memanggil getCurrentPositionAsync (High accuracy)...');
       const loc = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
+      });
+      console.log('[useLocation] Lokasi diterima:', {
+        lat: loc.coords.latitude,
+        lng: loc.coords.longitude,
+        accuracy: loc.coords.accuracy,
+        timestamp: loc.timestamp,
       });
 
       // Detect mock GPS (Android)
@@ -67,6 +87,7 @@ export function useLocation(): UseLocationResult {
       if (Platform.OS === 'android') {
         // Android: check if the location is mocked
         isMockGps = (loc as any).mocked === true;
+        console.log('[useLocation] Android mocked GPS:', isMockGps);
       }
 
       // Additional checks:
@@ -74,16 +95,20 @@ export function useLocation(): UseLocationResult {
       // 2. Device bukan physical device
       if (!Device.isDevice) {
         isMockGps = true; // Emulator/simulator
+        console.log('[useLocation] Bukan physical device, isMockGps set true.');
       }
 
-      setLocation({
+      const locationData = {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
         accuracy: loc.coords.accuracy,
         isMockGps,
         timestamp: loc.timestamp,
-      });
+      };
+      setLocation(locationData);
+      console.log('[useLocation] Location state diupdate:', locationData);
     } catch (err: any) {
+      console.error('[useLocation] ERROR saat fetch lokasi:', err.message, err);
       setError(`Gagal mendapatkan lokasi: ${err.message}`);
     } finally {
       setLoading(false);

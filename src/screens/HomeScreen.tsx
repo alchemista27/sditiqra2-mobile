@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, Alert,
-  ActivityIndicator, ScrollView, RefreshControl,
+  ActivityIndicator, ScrollView, RefreshControl, Linking,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
@@ -50,10 +50,14 @@ export default function HomeScreen() {
   }, [refreshGps]);
 
   const handleClockAction = async (action: 'in' | 'out') => {
+    console.log('[HomeScreen] handleClockAction dipanggil, action:', action);
     if (!location) {
+      console.warn('[HomeScreen] location null saat handleClockAction, GPS belum siap.');
       Alert.alert('GPS Error', 'Lokasi GPS belum tersedia. Coba refresh.');
       return;
     }
+
+    console.log('[HomeScreen] Location saat clock action:', location);
 
     // Check geofencing client-side
     if (status?.config) {
@@ -62,6 +66,7 @@ export default function HomeScreen() {
         status.config.schoolLatitude, status.config.schoolLongitude,
         status.config.radiusMeters
       );
+      console.log('[HomeScreen] Geofence check:', check);
       if (!check.isWithin) {
         Alert.alert(
           'Di Luar Radius',
@@ -76,6 +81,7 @@ export default function HomeScreen() {
     }
 
     if (location.isMockGps) {
+      console.warn('[HomeScreen] Mock GPS terdeteksi, absensi ditolak.');
       Alert.alert('Fake GPS Terdeteksi', 'Anda menggunakan GPS palsu. Absensi tidak dapat dilakukan.');
       return;
     }
@@ -125,6 +131,7 @@ export default function HomeScreen() {
   const submitClock = async (faceResult: any) => {
     if (!location) return;
     setClockLoading(true);
+    console.log('[HomeScreen] submitClock dimulai, action:', clockAction);
     try {
       const gpsData = {
         latitude: location.latitude,
@@ -133,6 +140,7 @@ export default function HomeScreen() {
         faceConfidence: faceResult.confidence,
         selfieUrl: faceResult.selfieUri,
       };
+      console.log('[HomeScreen] Payload clock:', gpsData);
 
       let res;
       if (clockAction === 'in') {
@@ -141,11 +149,13 @@ export default function HomeScreen() {
         res = await attendanceService.clockOut(gpsData);
       }
 
+      console.log('[HomeScreen] Clock berhasil:', res);
       const confText = faceResult.confidence < 1 ? ` (Face: ${Math.round(faceResult.confidence * 100)}%)` : '';
       Alert.alert('Berhasil', `${res.message}${confText}`);
       await loadData();
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message;
+      console.error('[HomeScreen] submitClock ERROR:', msg, err.response?.data, err);
       Alert.alert('Gagal', msg);
     } finally {
       setClockLoading(false);
@@ -237,7 +247,16 @@ export default function HomeScreen() {
         {gpsLoading ? (
           <ActivityIndicator color="#1B6B44" style={{ marginVertical: 8 }} />
         ) : gpsError ? (
-          <Text style={styles.gpsError}>{gpsError}</Text>
+          <View>
+            <Text style={styles.gpsError}>{gpsError}</Text>
+            <TouchableOpacity
+              onPress={() => Linking.openSettings()}
+              style={styles.openSettingsBtn}
+            >
+              <MaterialIcons name="settings" size={14} color="#1B6B44" />
+              <Text style={styles.openSettingsText}> Buka Pengaturan Izin</Text>
+            </TouchableOpacity>
+          </View>
         ) : location ? (
           <View>
             <View style={styles.gpsRow}>
@@ -446,4 +465,13 @@ const styles = StyleSheet.create({
   captureInner: {
     width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff',
   },
+
+  // GPS permission shortcut
+  openSettingsBtn: {
+    flexDirection: 'row', alignItems: 'center', marginTop: 8,
+    paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8,
+    backgroundColor: '#F0FDF4', borderWidth: 1, borderColor: '#6EE7B7',
+    alignSelf: 'flex-start',
+  },
+  openSettingsText: { color: '#1B6B44', fontSize: 13, fontWeight: '600' },
 });

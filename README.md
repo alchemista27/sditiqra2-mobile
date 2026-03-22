@@ -38,3 +38,38 @@ Aplikasi ini menggunakan sistem **Bottom Tabs Navigation** yang ringan dan stabi
 - GPS Module: `expo-location`
 - Navigation: `@react-navigation/bottom-tabs`
 - Storage: `AsyncStorage`
+
+## Panduan Debugging (Expo Go)
+
+Error dari React Native kadang hanya muncul di UI Expo Go dan tidak terlihat di terminal. Gunakan cara berikut untuk menampilkan log secara penuh di komputer.
+
+### 1. Lihat Log via Metro Bundler
+Semua `console.log` / `console.error` akan tampil di terminal Metro saat debugging:
+```bash
+npx expo start --dev
+```
+Seluruh file sudah menggunakan prefix `[useLocation]`, `[HomeScreen]`, dll. untuk memudahkan filter log.
+
+### 2. Android — ADB Logcat
+Sambungkan perangkat Android via USB (dengan USB Debugging aktif) lalu jalankan:
+```bash
+adb logcat | grep -E "ReactNativeJS|ExpoGo|GPS"
+```
+
+### 3. iOS — Console.app / Simulator
+Untuk simulator iOS:
+```bash
+xcrun simctl spawn booted log stream --predicate 'process == "Expo Go"'
+```
+
+### 4. Remote JS Debugger
+Di Expo Go, shake perangkat → **Debug Remote JS**. Semua log akan muncul di browser Chrome DevTools.
+
+### 5. Global Error Handler
+`App.tsx` sudah memasang `ErrorUtils.setGlobalHandler` yang menangkap semua *unhandled error* (termasuk promise rejection) dan meneruskannya ke `console.error`. Ini memastikan error tidak hilang begitu saja di Expo Go.
+
+### Tips GPS
+- Pastikan GPS di perangkat **aktif** (bukan hanya izin diberikan).
+- Jika muncul pesan error izin lokasi, tap tombol **"Buka Pengaturan Izin"** di kartu GPS untuk langsung membuka halaman izin sistem.
+- Emulator akan selalu terdeteksi sebagai `isMockGps = true` — gunakan perangkat fisik untuk testing absensi.
+
