@@ -12,6 +12,10 @@ export const authService = {
     const res = await apiClient.get('/auth/me');
     return res.data;
   },
+  changePassword: async (oldPassword: string, newPassword: string) => {
+    const res = await apiClient.put('/auth/change-password', { oldPassword, newPassword });
+    return res.data;
+  },
 };
 
 // ─── Attendance ──────────────────────────────────────────────

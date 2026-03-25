@@ -3,11 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { storage } from '../utils/storage';
+import EditPasswordScreen from './EditPasswordScreen';
 
 interface Props { onLogout: () => void; }
 
 export default function ProfileScreen({ onLogout }: Props) {
   const [user, setUser] = useState<any>(null);
+  const [showEditPassword, setShowEditPassword] = useState(false);
 
   useEffect(() => {
     (async () => { const u = await storage.getUser(); setUser(u); })();
@@ -19,6 +21,11 @@ export default function ProfileScreen({ onLogout }: Props) {
       { text: 'Keluar', style: 'destructive', onPress: async () => { await storage.clearAll(); onLogout(); } },
     ]);
   };
+
+  // Show EditPasswordScreen as a full-screen overlay
+  if (showEditPassword) {
+    return <EditPasswordScreen onBack={() => setShowEditPassword(false)} onLogout={onLogout} />;
+  }
 
   return (
     <ScrollView style={s.container}>
@@ -38,6 +45,14 @@ export default function ProfileScreen({ onLogout }: Props) {
         <View style={s.row}><Text style={s.rowLabel}>Versi Aplikasi</Text><Text style={s.rowVal}>1.0.0</Text></View>
         <View style={s.row}><Text style={s.rowLabel}>Platform</Text><Text style={s.rowVal}>Expo / React Native</Text></View>
       </View>
+
+      <TouchableOpacity style={s.editPwBtn} onPress={() => setShowEditPassword(true)} activeOpacity={0.8}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <MaterialIcons name="lock-outline" size={18} color="#1B6B44" />
+          <Text style={s.editPwTxt}>Ubah Password</Text>
+        </View>
+        <MaterialIcons name="chevron-right" size={20} color="#1B6B44" />
+      </TouchableOpacity>
 
       <TouchableOpacity style={s.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -64,6 +79,8 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
   rowLabel: { fontSize: 14, color: '#374151' },
   rowVal: { fontSize: 14, color: '#6B7280', fontWeight: '500' },
-  logoutBtn: { backgroundColor: '#FEE2E2', marginHorizontal: 16, marginTop: 16, borderRadius: 14, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: '#FECACA' },
+  editPwBtn: { backgroundColor: '#D1FAE5', marginHorizontal: 16, marginTop: 16, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: '#A7F3D0' },
+  editPwTxt: { color: '#1B6B44', fontSize: 15, fontWeight: '700' },
+  logoutBtn: { backgroundColor: '#FEE2E2', marginHorizontal: 16, marginTop: 12, borderRadius: 14, paddingVertical: 14, alignItems: 'center', borderWidth: 1, borderColor: '#FECACA' },
   logoutTxt: { color: '#991B1B', fontSize: 15, fontWeight: '700' },
 });
